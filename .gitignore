@@ -10,4 +10,4 @@ artifacts
 
 #Config
 *.secret
-*.json
+hardhat-privateKeys.json

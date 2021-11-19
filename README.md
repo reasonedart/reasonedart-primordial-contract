@@ -12,7 +12,10 @@ yarn install
 
 ### Test
 
-To test the contract execute:
+To test the contract add hardhat-privateKeys.json with an array of hardhat
+private keys.
+
+To execute test run:
 
 ```console
 npx hardhat test
