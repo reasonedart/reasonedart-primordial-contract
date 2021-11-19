@@ -16,12 +16,18 @@ describe("Reasoned Art", async function (accounts) {
 
     const [addr0, addr1] = await ethers.getSigners();
 
-    // Deploy PablockToken
+    /**
+     * Deploy PablokcToken
+     * Used only on test env, simulate Pablock smart contracts
+     */
     const PablockToken = await ethers.getContractFactory("PablockToken");
     const pablockToken = await PablockToken.deploy(1000000000);
     await pablockToken.deployed();
 
-    // Deploy EIP712MetaTransaction
+    /**
+     * Deploy EIP712MetaTransaction
+     * Used only on test env, simulate Pablock meta transaction
+     */
     const EIP712MetaTransaction = await ethers.getContractFactory(
       "EIP712MetaTransaction",
     );
@@ -41,7 +47,10 @@ describe("Reasoned Art", async function (accounts) {
     );
     await reasonedArt.deployed();
 
-    // Enable contract
+    /**
+     * Enable contract on PablockToken contract
+     * In mainnet this procedure it will be done by BCode
+     */
     await pablockToken.requestToken(addr1.address, 10);
     await pablockToken.addContractToWhitelist(metaTransaction.address, 1, 3);
     await pablockToken.addContractToWhitelist(reasonedArt.address, 1, 1);
@@ -88,6 +97,7 @@ describe("Reasoned Art", async function (accounts) {
   it("should generate function sig", async () => {
     const [addr0, addr1] = await ethers.getSigners();
 
+    // Generating function signature for function mintToken of Reasoned Art contract
     const functionSignature = (
       await reasonedArt.populateTransaction.mintToken(
         addr1.address,
@@ -97,6 +107,10 @@ describe("Reasoned Art", async function (accounts) {
 
     const nonce = await metaTransaction.getNonce(addr1.address);
 
+    /**
+     * Sign function call with user private key
+     * Note: chainId value change on every network, 31337 is reffered to hardhat network.
+     */
     const { r, s, v } = await getTransactionData(
       nonce,
       functionSignature,
