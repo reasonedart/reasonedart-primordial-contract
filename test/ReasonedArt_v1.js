@@ -3,12 +3,13 @@ const { ethers, run, waffle } = require("hardhat");
 
 const { getTransactionData } = require("../common/EIP712_utils");
 
-const TOKEN_URI = "http://gateway.api.pinata/ipfs/";
+const TOKEN_URI = "http://gateway.api.pinata/ipfs";
 
 const privateKeys = require("../hardhat-privateKeys.json");
 
 let reasonedArt = null;
 let metaTransaction = null;
+let reasonedArtData = null;
 
 describe("Reasoned Art", async function (accounts) {
   it("should deploy contract", async () => {
@@ -39,11 +40,22 @@ describe("Reasoned Art", async function (accounts) {
     await metaTransaction.deployed();
 
     // Deploy ReasonedArt
-    const ReasonedArt = await ethers.getContractFactory("ReasonedArt");
+    const ReasonedArtData = await ethers.getContractFactory("ReasonedArtData");
+    reasonedArtData = await ReasonedArtData.connect(addr1).deploy(
+      "ReasonedArtData",
+      "0.1.0",
+      metaTransaction.address,
+      addr1.address,
+    );
+    await reasonedArtData.deployed();
+
+    // Deploy ReasonedArt
+    const ReasonedArt = await ethers.getContractFactory("ReasonedArtV1");
     reasonedArt = await ReasonedArt.connect(addr1).deploy(
       "ReasonedArt",
       "RART",
       metaTransaction.address,
+      reasonedArtData.address,
     );
     await reasonedArt.deployed();
 
@@ -54,6 +66,10 @@ describe("Reasoned Art", async function (accounts) {
     await pablockToken.requestToken(addr1.address, 10);
     await pablockToken.addContractToWhitelist(metaTransaction.address, 1, 3);
     await pablockToken.addContractToWhitelist(reasonedArt.address, 1, 1);
+
+    await reasonedArtData
+      .connect(addr1)
+      .setWhitelistedDestination(reasonedArt.address);
 
     // console.log("META TX ==>", metaTransaction.address);
     // console.log("CONTRACT ==>", reasonedArt.address);
@@ -68,6 +84,13 @@ describe("Reasoned Art", async function (accounts) {
 
     expect(data).to.equals(true);
   });
+  it("contract should be whitelisted", async () => {
+    const data = await reasonedArtData.getWhitelistedDestinationStatus(
+      reasonedArt.address,
+    );
+
+    expect(data).to.equals(true);
+  });
   it("metatx contract should be authorized", async () => {
     const data = await reasonedArt.getAuthStatus(metaTransaction.address);
 
@@ -76,32 +99,27 @@ describe("Reasoned Art", async function (accounts) {
   it("shoul mint token directly", async () => {
     const [addr0, addr1] = await ethers.getSigners();
 
-    const tx = await reasonedArt.mintToken(
-      addr1.address,
-      `${TOKEN_URI}/directly`,
-    );
+    const tx = await reasonedArt.mintToken(addr1.address, `${TOKEN_URI}/0`);
     await tx.wait();
 
     const tokenURI = await reasonedArt.tokenURI(0);
-    expect(tokenURI).to.equal(`${TOKEN_URI}/directly`);
+    expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
   });
   it("shoul not mint token directly", async () => {
     const [addr0] = await ethers.getSigners();
 
     await expect(
-      reasonedArt
-        .connect(addr0)
-        .mintToken(addr0.address, `${TOKEN_URI}/directly`),
+      reasonedArt.connect(addr0).mintToken(addr0.address, `${TOKEN_URI}/0`),
     ).to.be.revertedWith("Not authorized to execute this function");
   });
-  it("should generate function sig", async () => {
+  it("should mint with metatransaction", async () => {
     const [addr0, addr1] = await ethers.getSigners();
 
     // Generating function signature for function mintToken of Reasoned Art contract
     const functionSignature = (
       await reasonedArt.populateTransaction.mintToken(
         addr1.address,
-        `${TOKEN_URI}/metatransacted`,
+        `${TOKEN_URI}/1`,
       )
     ).data;
 
@@ -138,7 +156,7 @@ describe("Reasoned Art", async function (accounts) {
     await tx.wait();
 
     const tokenURI = await reasonedArt.tokenURI(1);
-    expect(tokenURI).to.equal(`${TOKEN_URI}/metatransacted`);
+    expect(tokenURI).to.equal(`${TOKEN_URI}/1`);
   });
   it("should transfer with meta transaction", async () => {
     const [addr0, addr1] = await ethers.getSigners();
@@ -146,8 +164,8 @@ describe("Reasoned Art", async function (accounts) {
     const functionSignature = (
       await reasonedArt.populateTransaction.transferFrom(
         addr1.address,
-        addr0.address,
-        1,
+        reasonedArt.address,
+        0,
       )
     ).data;
 
@@ -179,16 +197,16 @@ describe("Reasoned Art", async function (accounts) {
 
     await tx.wait();
 
-    const tokenURI = await reasonedArt.tokenURI(1);
-    expect(tokenURI).to.equal(`${TOKEN_URI}/metatransacted`);
+    const tokenURI = await reasonedArt.tokenURI(0);
+    expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
   });
   it("should not transfer with meta transaction", async () => {
     const [addr0, addr1] = await ethers.getSigners();
 
     const functionSignature = (
       await reasonedArt.populateTransaction.transferFrom(
-        addr0.address,
         addr1.address,
+        addr0.address,
         1,
       )
     ).data;
@@ -219,6 +237,11 @@ describe("Reasoned Art", async function (accounts) {
           v,
           { gasLimit: 1000000, gasPrice: 5000000000 },
         ),
-    ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+    ).to.be.revertedWith("Destionation is not in whitelist");
+  });
+  it("should disable smart contract", async () => {
+    await reasonedArt.disableSmartContract();
+
+    expect(await reasonedArt.getContractStatus()).to.equal(true);
   });
 });

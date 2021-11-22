@@ -6,7 +6,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const [deployer, addr1] = await ethers.getSigners();
 
   // Deploy PablokcToken for executing test
   const PablockToken = await ethers.getContractFactory("PablockToken");
@@ -29,11 +29,27 @@ async function main() {
   );
   await pablockToken.deployed();
 
+  // Deploy ReasonedArtData
+  const ReasonedArtData = await ethers.getContractFactory("ReasonedArtData");
+  const reasonedArtData = await ReasonedArtData.deploy(
+    "ReasonedArtData",
+    "0.1.0",
+    metaTx.address,
+    deployer.address,
+    {
+      gasLimit: 500000,
+      gasPrice: 100000000000,
+    },
+  );
+  await pablockToken.deployed();
+
   const ReasonedArt = await ethers.getContractFactory("ReasonedArt");
   const reasonedArt = await ReasonedArt.deploy(
     "ReasonedArt",
     "RART",
     metaTx.address,
+    reasonedArtData.address,
+
     { gasLimit: 500000, gasPrice: 100000000000 },
   );
 
@@ -41,6 +57,8 @@ async function main() {
 
   await pablockToken.addContractToWhitelist(metaTx.address, 1, 3);
   await pablockToken.addContractToWhitelist(reasonedArt.address, 1, 2);
+
+  await reasonedArtData.setWhitelistedDestiantion(reasonedArt.address);
 
   console.log("ReasonedArt:", reasonedArt.address);
 }

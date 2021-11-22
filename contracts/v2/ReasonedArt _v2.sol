@@ -4,14 +4,11 @@ pragma solidity ^0.7.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "pablock-smartcontracts/contracts/PablockMetaTxReceiver.sol";
 
-import "../ReasonedArtData.sol";
-
 import "hardhat/console.sol";
 
-contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
+contract ReasonedArtV2 is ERC721, PablockMetaTxReceiver {
   uint256 public counter;
   address public contractOwner;
-  address private rartDataAddress;
   bool private isDisabled = false;
 
   mapping(address => bool) private authorized;
@@ -19,8 +16,7 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
   constructor(
     string memory _tokenName,
     string memory _tokenSymbol,
-    address _metaTxAddress,
-    address _rartDataAddress
+    address _metaTxAddress
   )
     ERC721(_tokenName, _tokenSymbol)
     PablockMetaTxReceiver(_tokenName, "0.0.1", _metaTxAddress)
@@ -28,7 +24,6 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
     counter = 0;
 
     contractOwner = msgSender();
-    rartDataAddress = _rartDataAddress;
     authorized[contractOwner] = true;
     authorized[_metaTxAddress] = true;
   }
@@ -61,9 +56,6 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
   //Be aware! This function will disable minting and transfer of NFT
   function disableSmartContract() public isAuthorized returns (bool) {
     isDisabled = true;
-  }
-
-  function getContractStatus() public view returns (bool) {
     return isDisabled;
   }
 
@@ -72,11 +64,6 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
     address to,
     uint256 tokenId
   ) public virtual override checkIsDisabled {
-    require(
-      ReasonedArtData(rartDataAddress).getWhitelistedDestinationStatus(to),
-      "Destionation is not in whitelist"
-    );
-
     require(
       _isApprovedOrOwner(msgSender(), tokenId),
       "ERC721: transfer caller is not owner nor approved"
