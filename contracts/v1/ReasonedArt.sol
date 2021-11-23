@@ -30,7 +30,7 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
     contractOwner = msgSender();
     rartDataAddress = _rartDataAddress;
     authorized[contractOwner] = true;
-    authorized[_metaTxAddress] = true;
+    // authorized[_metaTxAddress] = true;
   }
 
   modifier isAuthorized() {
@@ -71,7 +71,7 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
     address from,
     address to,
     uint256 tokenId
-  ) public virtual override checkIsDisabled {
+  ) public virtual override {
     require(
       ReasonedArtData(rartDataAddress).getWhitelistedDestinationStatus(to),
       "Destionation is not in whitelist"
@@ -83,5 +83,9 @@ contract ReasonedArtV1 is ERC721, PablockMetaTxReceiver {
     );
 
     _transfer(from, to, tokenId);
+  }
+
+  function changeDataContract(address addr) public isAuthorized {
+    rartDataAddress = addr;
   }
 }

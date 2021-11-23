@@ -91,12 +91,12 @@ describe("Reasoned Art", async function (accounts) {
 
     expect(data).to.equals(true);
   });
-  it("metatx contract should be authorized", async () => {
-    const data = await reasonedArt.getAuthStatus(metaTransaction.address);
+  // it("metatx contract should be authorized", async () => {
+  //   const data = await reasonedArt.getAuthStatus(metaTransaction.address);
 
-    expect(data).to.equals(true);
-  });
-  it("shoul mint token directly", async () => {
+  //   expect(data).to.equals(true);
+  // });
+  it("should mint token directly", async () => {
     const [addr0, addr1] = await ethers.getSigners();
 
     const tx = await reasonedArt.mintToken(addr1.address, `${TOKEN_URI}/0`);
@@ -105,7 +105,7 @@ describe("Reasoned Art", async function (accounts) {
     const tokenURI = await reasonedArt.tokenURI(0);
     expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
   });
-  it("shoul not mint token directly", async () => {
+  it("should not mint token directly", async () => {
     const [addr0] = await ethers.getSigners();
 
     await expect(
@@ -243,5 +243,12 @@ describe("Reasoned Art", async function (accounts) {
     await reasonedArt.disableSmartContract();
 
     expect(await reasonedArt.getContractStatus()).to.equal(true);
+  });
+  it("shoul not mint token because contract is disabled", async () => {
+    const [addr0, addr1] = await ethers.getSigners();
+
+    await expect(
+      reasonedArt.connect(addr1).mintToken(addr0.address, `${TOKEN_URI}/0`),
+    ).to.be.revertedWith("Smart contract is disabled!");
   });
 });
