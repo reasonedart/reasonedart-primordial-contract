@@ -58,7 +58,7 @@ async function main() {
   await pablockToken.addContractToWhitelist(metaTx.address, 1, 3);
   await pablockToken.addContractToWhitelist(reasonedArt.address, 1, 2);
 
-  await reasonedArtData.setWhitelistedDestiantion(reasonedArt.address);
+  await reasonedArtData.setWhitelistedDestination(reasonedArt.address);
 
   console.log("ReasonedArt:", reasonedArt.address);
 }

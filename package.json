@@ -23,7 +23,7 @@
     "solidity-coverage": "^0.7.17"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/contracts": "^4.4.0",
     "pablock-smartcontracts": "git+https://github.com/bcode-tech/Pablock-Smart-Contracts"
   }
 }

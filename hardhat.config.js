@@ -40,29 +40,25 @@ if (!isCI) {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.7.4",
+  solidity: "0.8.9",
   networks: {
     local: {
       url: "http://127.0.0.1:7545",
     },
     matic: {
       url: `https://polygon-mainnet.infura.io/v3/${infuraKey}`,
-
       accounts: [maticPrivate],
     },
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${infuraKey}`,
-
       accounts: [mumbaiPrivate],
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${infuraKey}`,
-
       accounts: [goerliPrivate],
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${infuraKey}`,
-
       accounts: [ropstenPrivate],
     },
   },

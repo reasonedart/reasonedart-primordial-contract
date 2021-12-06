@@ -1,12 +1,17 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.7.4;
+pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "pablock-smartcontracts/contracts/PablockMetaTxReceiver.sol";
 
 import "hardhat/console.sol";
 
-contract ReasonedArtV2 is ERC721, PablockMetaTxReceiver {
+contract ReasonedArtV2 is
+  ERC721URIStorage,
+  ERC721Enumerable,
+  PablockMetaTxReceiver
+{
   uint256 public counter;
   address public contractOwner;
   bool private isDisabled = false;
@@ -70,5 +75,42 @@ contract ReasonedArtV2 is ERC721, PablockMetaTxReceiver {
     );
 
     _transfer(from, to, tokenId);
+  }
+
+  //Functions override
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 amount
+  ) internal virtual override(ERC721, ERC721Enumerable) {
+    super._beforeTokenTransfer(from, to, amount);
+  }
+
+  function _burn(uint256 tokenId)
+    internal
+    virtual
+    override(ERC721, ERC721URIStorage)
+  {
+    super._burn(tokenId);
+  }
+
+  function supportsInterface(bytes4 interfaceId)
+    public
+    view
+    virtual
+    override(ERC721, ERC721Enumerable)
+    returns (bool)
+  {
+    super.supportsInterface(interfaceId);
+  }
+
+  function tokenURI(uint256 tokenId)
+    public
+    view
+    virtual
+    override(ERC721, ERC721URIStorage)
+    returns (string memory)
+  {
+    super.tokenURI(tokenId);
   }
 }
