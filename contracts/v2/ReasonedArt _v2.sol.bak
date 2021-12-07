@@ -24,13 +24,18 @@ contract ReasonedArtV2 is
     address _metaTxAddress
   )
     ERC721(_tokenName, _tokenSymbol)
-    PablockMetaTxReceiver(_tokenName, "0.0.1", _metaTxAddress)
+    PablockMetaTxReceiver(_tokenName, "0.0.1")
   {
     counter = 0;
 
     contractOwner = msgSender();
     authorized[contractOwner] = true;
     authorized[_metaTxAddress] = true;
+  }
+
+  modifier onlyOwner() {
+    require(msgSender() == contractOwner, "Not allowed");
+    _;
   }
 
   modifier isAuthorized() {
@@ -41,6 +46,10 @@ contract ReasonedArtV2 is
   modifier checkIsDisabled() {
     require(!isDisabled, "Smart contract is disabled!");
     _;
+  }
+
+  function initializeMetaTransaction(address _metaTxAddress) public onlyOwner {
+    setMetaTransaction(_metaTxAddress);
   }
 
   function getAuthStatus(address addr) public view returns (bool) {

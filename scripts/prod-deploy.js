@@ -6,7 +6,7 @@
 
 const { ethers } = require("hardhat");
 
-const PABLOCK_META_TX = "0x3FEecd6269D880Fff83bA82ddA90639062377FB3"; // Fill with Pablock Meta transaction cotnract address for selected network
+const PABLOCK_META_TX = ""; // Fill with Pablock Meta transaction cotnract address for selected network
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -16,7 +16,6 @@ async function main() {
   const reasonedArtData = await ReasonedArtData.deploy(
     "ReasonedArtData",
     "0.1.0",
-    PABLOCK_META_TX,
     deployer.address,
     {
       gasLimit: 500000,
@@ -29,13 +28,15 @@ async function main() {
   const reasonedArt = await ReasonedArt.deploy(
     "ReasonedArt",
     "RART",
-    PABLOCK_META_TX,
     reasonedArtData.address,
 
     { gasLimit: 10000000, gasPrice: 10000000000 },
   );
 
   await reasonedArt.deployed();
+
+  await reasonedArtData.initializeMetaTransaction(PABLOCK_META_TX);
+  await reasonedArt.initializeMetaTransaction(PABLOCK_META_TX);
 
   await reasonedArtData.setWhitelistedDestination(reasonedArt.address);
 

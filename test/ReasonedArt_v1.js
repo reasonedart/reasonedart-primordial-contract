@@ -18,14 +18,6 @@ describe("Reasoned Art", async function (accounts) {
     const [addr0, addr1] = await ethers.getSigners();
 
     /**
-     * Deploy PablokcToken
-     * Used only on test env, simulate Pablock smart contracts
-     */
-    const PablockToken = await ethers.getContractFactory("PablockToken");
-    const pablockToken = await PablockToken.deploy(1000000000);
-    await pablockToken.deployed();
-
-    /**
      * Deploy EIP712MetaTransaction
      * Used only on test env, simulate Pablock meta transaction
      */
@@ -35,16 +27,27 @@ describe("Reasoned Art", async function (accounts) {
     metaTransaction = await EIP712MetaTransaction.deploy(
       "MetaTransaction",
       "0.0.1",
-      pablockToken.address,
     );
     await metaTransaction.deployed();
+
+    /**
+     * Deploy PablockToken
+     * Used only on test env, simulate Pablock smart contracts
+     */
+    const PablockToken = await ethers.getContractFactory("PablockToken");
+    const pablockToken = await PablockToken.deploy(
+      1000000000,
+      metaTransaction.address,
+    );
+    await pablockToken.deployed();
+
+    await metaTransaction.initialize(pablockToken.address);
 
     // Deploy ReasonedArt
     const ReasonedArtData = await ethers.getContractFactory("ReasonedArtData");
     reasonedArtData = await ReasonedArtData.connect(addr1).deploy(
       "ReasonedArtData",
       "0.1.0",
-      metaTransaction.address,
       addr1.address,
     );
     await reasonedArtData.deployed();
@@ -54,10 +57,12 @@ describe("Reasoned Art", async function (accounts) {
     reasonedArt = await ReasonedArt.connect(addr1).deploy(
       "ReasonedArt",
       "RART",
-      metaTransaction.address,
       reasonedArtData.address,
     );
     await reasonedArt.deployed();
+
+    await reasonedArtData.initializeMetaTransaction(metaTransaction.address);
+    await reasonedArt.initializeMetaTransaction(metaTransaction.address);
 
     /**
      * Enable contract on PablockToken contract
@@ -102,7 +107,7 @@ describe("Reasoned Art", async function (accounts) {
     const tx = await reasonedArt.mintToken(addr1.address, `${TOKEN_URI}/0`);
     await tx.wait();
 
-    const tokenURI = await reasonedArt.tokenURI(0);
+    const tokenURI = await reasonedArt.tokenURI(1);
     expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
   });
   it("should not mint token directly", async () => {
@@ -155,7 +160,7 @@ describe("Reasoned Art", async function (accounts) {
 
     await tx.wait();
 
-    const tokenURI = await reasonedArt.tokenURI(1);
+    const tokenURI = await reasonedArt.tokenURI(2);
     expect(tokenURI).to.equal(`${TOKEN_URI}/1`);
   });
   it("should transfer with meta transaction", async () => {
@@ -165,7 +170,7 @@ describe("Reasoned Art", async function (accounts) {
       await reasonedArt.populateTransaction.transferFrom(
         addr1.address,
         reasonedArt.address,
-        0,
+        1,
       )
     ).data;
 
@@ -197,7 +202,7 @@ describe("Reasoned Art", async function (accounts) {
 
     await tx.wait();
 
-    const tokenURI = await reasonedArt.tokenURI(0);
+    const tokenURI = await reasonedArt.tokenURI(1);
     expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
   });
   it("should not transfer with meta transaction", async () => {

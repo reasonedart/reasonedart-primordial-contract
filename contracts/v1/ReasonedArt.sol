@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "../ReasonedArtData.sol";
+
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "pablock-smartcontracts/contracts/PablockMetaTxReceiver.sol";
-
-import "../ReasonedArtData.sol";
+import "pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol";
 
 import "hardhat/console.sol";
 
@@ -24,11 +24,10 @@ contract ReasonedArtV1 is
   constructor(
     string memory _tokenName,
     string memory _tokenSymbol,
-    address _metaTxAddress,
     address _rartDataAddress
   )
     ERC721(_tokenName, _tokenSymbol)
-    PablockMetaTxReceiver(_tokenName, "0.0.1", _metaTxAddress)
+    PablockMetaTxReceiver(_tokenName, "0.0.1")
   {
     counter = 0;
 
@@ -36,6 +35,11 @@ contract ReasonedArtV1 is
     rartDataAddress = _rartDataAddress;
     authorized[contractOwner] = true;
     // authorized[_metaTxAddress] = true;
+  }
+
+  modifier onlyOwner() {
+    require(msgSender() == contractOwner, "Not allowed");
+    _;
   }
 
   modifier isAuthorized() {
@@ -48,6 +52,10 @@ contract ReasonedArtV1 is
     _;
   }
 
+  function initializeMetaTransaction(address _metaTxAddress) public onlyOwner {
+    setMetaTransaction(_metaTxAddress);
+  }
+
   function getAuthStatus(address addr) public view returns (bool) {
     return authorized[addr];
   }
@@ -57,10 +65,9 @@ contract ReasonedArtV1 is
     isAuthorized
     checkIsDisabled
   {
+    counter++;
     _safeMint(_to, counter);
     _setTokenURI(counter, _uri);
-
-    counter++;
   }
 
   //Be aware! This function will disable minting and transfer of NFT
@@ -118,7 +125,7 @@ contract ReasonedArtV1 is
     override(ERC721, ERC721Enumerable)
     returns (bool)
   {
-    super.supportsInterface(interfaceId);
+    return super.supportsInterface(interfaceId);
   }
 
   function tokenURI(uint256 tokenId)
@@ -128,6 +135,6 @@ contract ReasonedArtV1 is
     override(ERC721, ERC721URIStorage)
     returns (string memory)
   {
-    super.tokenURI(tokenId);
+    return super.tokenURI(tokenId);
   }
 }
