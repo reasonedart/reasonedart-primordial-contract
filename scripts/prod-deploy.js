@@ -18,17 +18,19 @@ async function main() {
         '0.1.0',
         deployer.address,
         {
+            gasLimit: 10000000,
             gasPrice: 10000000000,
         },
     );
     await reasonedArtData.deployed();
+
+    console.log(deployer);
 
     const ReasonedArt = await ethers.getContractFactory('ReasonedArtV1');
     const reasonedArt = await ReasonedArt.deploy(
         'ReasonedArt',
         'RART',
         reasonedArtData.address,
-
         { gasLimit: 10000000, gasPrice: 10000000000 },
     );
 

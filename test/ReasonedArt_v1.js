@@ -35,10 +35,7 @@ describe('Reasoned Art', async function (accounts) {
          * Used only on test env, simulate Pablock smart contracts
          */
         const PablockToken = await ethers.getContractFactory('PablockToken');
-        const pablockToken = await PablockToken.deploy(
-            1000000000,
-            metaTransaction.address,
-        );
+        const pablockToken = await PablockToken.deploy(1000000000);
         await pablockToken.deployed();
 
         await metaTransaction.initialize(pablockToken.address);

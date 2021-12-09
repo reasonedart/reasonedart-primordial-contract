@@ -1,13 +1,11 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 import "./ReasonedArtData.sol";
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol";
-
-import "hardhat/console.sol";
 
 contract ReasonedArtV1 is
     ERC721URIStorage,
