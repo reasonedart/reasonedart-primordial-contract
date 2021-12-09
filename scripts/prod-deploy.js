@@ -18,7 +18,6 @@ async function main() {
         '0.1.0',
         deployer.address,
         {
-            gasLimit: 500000,
             gasPrice: 10000000000,
         },
     );
@@ -35,12 +34,13 @@ async function main() {
 
     await reasonedArt.deployed();
 
-    await reasonedArtData.initializeMetaTransaction(PABLOCK_META_TX);
-    await reasonedArt.initializeMetaTransaction(PABLOCK_META_TX);
+    // await reasonedArtData.initializeMetaTransaction(PABLOCK_META_TX);
+    // await reasonedArt.initializeMetaTransaction(PABLOCK_META_TX);
 
     await reasonedArtData.setWhitelistedDestination(reasonedArt.address);
 
     console.log('ReasonedArt:', reasonedArt.address);
+    console.log("ReasonedArtData:", reasonedArtData.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -24,6 +24,6 @@
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.4.0",
-        "pablock-smart-contracts": "git+https://github.com/bcode-tech/Pablock-Smart-Contracts"
+        "pablock-smart-contracts": "github:bcode-tech/Pablock-Smart-Contracts"
     }
 }

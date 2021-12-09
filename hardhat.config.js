@@ -1,72 +1,59 @@
-require('dotenv').config();
-
 require('@nomiclabs/hardhat-etherscan');
 require('@nomiclabs/hardhat-waffle');
 require('hardhat-gas-reporter');
 require('solidity-coverage');
 
-const fs = require('fs');
+require('./tasks/accounts');
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
-    const accounts = await hre.ethers.getSigners();
+require('dotenv').config();
 
-    for (const account of accounts) {
-        console.log(account.address);
-    }
-});
+const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL || 'NO_POLYGON_RPC_URL';
+const RART_PRIVATE_KEY = process.env.RART_PRIVATE_KEY || 'NO_PRIV_KEY';
+
+const POLYGON_MUMBAI_RPC_URL = process.env.POLYGON_MUMBAI_RPC_URL || 'NO_POLYGON_MUMBAI_RPC_URL';
+const PRIVATE_KEY = process.env.PRIVATE_KEY || 'NO_PRIV_KEY';
+
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || 'NO_ETHERSCAN_API_KEY';
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
-
-const isCI = process.env.CI;
-
-let infuraKey = null;
-let maticPrivate = null;
-let mumbaiPrivate = null;
-let goerliPrivate = null;
-let ropstenPrivate = null;
-
-if (!isCI) {
-    infuraKey = fs.readFileSync('.infurakey.secret').toString().trim();
-    maticPrivate = fs.readFileSync('.matic.secret').toString().trim();
-    mumbaiPrivate = fs.readFileSync('.mumbai.secret').toString().trim();
-    goerliPrivate = fs.readFileSync('.goerli.secret').toString().trim();
-    ropstenPrivate = fs.readFileSync('.ropsten.secret').toString().trim();
-}
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-    solidity: '0.8.9',
+    defaultNetwork: 'hardhat',
+
     networks: {
         local: {
-            url: 'http://127.0.0.1:7545',
+            url: 'http://127.0.0.1:8545/',
         },
-        matic: {
-            url: `https://polygon-mainnet.infura.io/v3/${infuraKey}`,
-            accounts: [maticPrivate],
+        polygon: {
+            url: POLYGON_RPC_URL,
+            accounts: [RART_PRIVATE_KEY],
         },
         mumbai: {
-            url: `https://polygon-mumbai.infura.io/v3/${infuraKey}`,
-            accounts: [mumbaiPrivate],
-        },
-        goerli: {
-            url: `https://goerli.infura.io/v3/${infuraKey}`,
-            accounts: [goerliPrivate],
-        },
-        ropsten: {
-            url: `https://ropsten.infura.io/v3/${infuraKey}`,
-            accounts: [ropstenPrivate],
+            url: POLYGON_MUMBAI_RPC_URL,
+            accounts: [PRIVATE_KEY],
         },
     },
+
     gasReporter: {
         enabled: process.env.REPORT_GAS !== undefined,
         currency: 'USD',
     },
+
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY,
+        apiKey: ETHERSCAN_API_KEY,
+    },
+
+    solidity: '0.8.9',
+
+    paths: {
+        sources: './contracts',
+        tests: './test',
+        cache: './cache',
+        artifacts: './artifacts',
     },
 };
+

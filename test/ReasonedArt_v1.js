@@ -90,6 +90,7 @@ describe('Reasoned Art', async function (accounts) {
         expect(reasonedArt).to.not.equal(null);
         expect(metaTransaction).to.not.equal(null);
     });
+
     it('owner should be authorized', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 
@@ -97,6 +98,7 @@ describe('Reasoned Art', async function (accounts) {
 
         expect(data).to.equals(true);
     });
+
     it('contract should be whitelisted', async () => {
         const data = await reasonedArtData.getWhitelistedDestinationStatus(
             reasonedArt.address,
@@ -104,11 +106,13 @@ describe('Reasoned Art', async function (accounts) {
 
         expect(data).to.equals(true);
     });
+
     // it("metatx contract should be authorized", async () => {
     //   const data = await reasonedArt.getAuthStatus(metaTransaction.address);
 
     //   expect(data).to.equals(true);
     // });
+
     it('should mint token directly', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 
@@ -118,6 +122,7 @@ describe('Reasoned Art', async function (accounts) {
         const tokenURI = await reasonedArt.tokenURI(1);
         expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
     });
+
     it('should not mint token directly', async () => {
         const [addr0] = await ethers.getSigners();
 
@@ -127,6 +132,7 @@ describe('Reasoned Art', async function (accounts) {
                 .mintToken(addr0.address, `${TOKEN_URI}/0`),
         ).to.be.revertedWith('Not authorized to execute this function');
     });
+
     it('should mint with metatransaction', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 
@@ -173,6 +179,7 @@ describe('Reasoned Art', async function (accounts) {
         const tokenURI = await reasonedArt.tokenURI(2);
         expect(tokenURI).to.equal(`${TOKEN_URI}/1`);
     });
+
     it('should transfer with meta transaction', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 
@@ -215,6 +222,7 @@ describe('Reasoned Art', async function (accounts) {
         const tokenURI = await reasonedArt.tokenURI(1);
         expect(tokenURI).to.equal(`${TOKEN_URI}/0`);
     });
+
     it('should not transfer with meta transaction', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 
@@ -254,11 +262,13 @@ describe('Reasoned Art', async function (accounts) {
                 ),
         ).to.be.revertedWith('Destionation is not in whitelist');
     });
+
     it('should disable smart contract', async () => {
         await reasonedArt.disableSmartContract();
 
         expect(await reasonedArt.getContractStatus()).to.equal(true);
     });
+
     it('shoul not mint token because contract is disabled', async () => {
         const [addr0, addr1] = await ethers.getSigners();
 

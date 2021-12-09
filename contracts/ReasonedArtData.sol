@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import 'pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol';
+import "pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol";
 
 contract ReasonedArtData is PablockMetaTxReceiver {
     address private contractOwner;
@@ -17,7 +17,7 @@ contract ReasonedArtData is PablockMetaTxReceiver {
     }
 
     modifier onlyOwner() {
-        require(contractOwner == msgSender(), 'Sender is not contract owner');
+        require(contractOwner == msgSender(), "Sender is not contract owner");
         _;
     }
 

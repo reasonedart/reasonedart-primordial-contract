@@ -11,7 +11,7 @@ async function main() {
     // Deploy PablokcToken for executing test
     const PablockToken = await ethers.getContractFactory('PablockToken');
     const pablockToken = await PablockToken.deploy(1000000000, {
-        gasLimit: 500000,
+        gasLimit: 5000000,
         gasPrice: 100000000000,
     });
     await pablockToken.deployed();
@@ -23,7 +23,7 @@ async function main() {
         '0.1.0',
         pablockToken.address,
         {
-            gasLimit: 500000,
+            gasLimit: 5000000,
             gasPrice: 100000000000,
         },
     );
@@ -37,7 +37,7 @@ async function main() {
         metaTx.address,
         deployer.address,
         {
-            gasLimit: 500000,
+            gasLimit: 5000000,
             gasPrice: 100000000000,
         },
     );
@@ -50,7 +50,7 @@ async function main() {
         metaTx.address,
         reasonedArtData.address,
 
-        { gasLimit: 500000, gasPrice: 100000000000 },
+        { gasLimit: 5000000, gasPrice: 100000000000 },
     );
 
     await reasonedArt.deployed();

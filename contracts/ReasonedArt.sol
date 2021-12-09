@@ -1,13 +1,13 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import '../ReasonedArtData.sol';
+import "./ReasonedArtData.sol";
 
-import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
-import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
-import 'pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol';
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "pablock-smart-contracts/contracts/PablockMetaTxReceiver.sol";
 
-import 'hardhat/console.sol';
+import "hardhat/console.sol";
 
 contract ReasonedArtV1 is
     ERC721URIStorage,
@@ -27,7 +27,7 @@ contract ReasonedArtV1 is
         address _rartDataAddress
     )
         ERC721(_tokenName, _tokenSymbol)
-        PablockMetaTxReceiver(_tokenName, '0.0.1')
+        PablockMetaTxReceiver(_tokenName, "0.0.1")
     {
         counter = 0;
 
@@ -38,20 +38,20 @@ contract ReasonedArtV1 is
     }
 
     modifier onlyOwner() {
-        require(msgSender() == contractOwner, 'Not allowed');
+        require(msgSender() == contractOwner, "Not allowed");
         _;
     }
 
     modifier isAuthorized() {
         require(
             authorized[msgSender()],
-            'Not authorized to execute this function'
+            "Not authorized to execute this function"
         );
         _;
     }
 
     modifier checkIsDisabled() {
-        require(!isDisabled, 'Smart contract is disabled!');
+        require(!isDisabled, "Smart contract is disabled!");
         _;
     }
 
@@ -79,6 +79,8 @@ contract ReasonedArtV1 is
     //Be aware! This function will disable minting and transfer of NFT
     function disableSmartContract() public isAuthorized returns (bool) {
         isDisabled = true;
+
+        return isDisabled;
     }
 
     function getContractStatus() public view returns (bool) {
@@ -94,12 +96,12 @@ contract ReasonedArtV1 is
             ReasonedArtData(rartDataAddress).getWhitelistedDestinationStatus(
                 to
             ),
-            'Destionation is not in whitelist'
+            "Destionation is not in whitelist"
         );
 
         require(
             _isApprovedOrOwner(msgSender(), tokenId),
-            'ERC721: transfer caller is not owner nor approved'
+            "ERC721: transfer caller is not owner nor approved"
         );
 
         _transfer(from, to, tokenId);
