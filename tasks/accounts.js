@@ -3,11 +3,11 @@
 task('accounts', 'Prints the list of accounts', async () => {
     const accounts = await ethers.getSigners();
 
-    console.log(accounts);
-
     for (const account of accounts) {
         console.log(account.address);
     }
+
+    return;
 });
 
 module.exports = {};

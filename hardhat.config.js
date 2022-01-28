@@ -3,7 +3,10 @@ require('@nomiclabs/hardhat-waffle');
 require('hardhat-gas-reporter');
 require('solidity-coverage');
 
+// Tasks
 require('./tasks/accounts');
+require('./tasks/lock');
+require('./tasks/mint');
 
 require('dotenv').config();
 

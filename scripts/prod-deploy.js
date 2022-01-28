@@ -24,8 +24,6 @@ async function main() {
     );
     await reasonedArtData.deployed();
 
-    console.log(deployer);
-
     const ReasonedArt = await ethers.getContractFactory('ReasonedArtV1');
     const reasonedArt = await ReasonedArt.deploy(
         'ReasonedArt',
